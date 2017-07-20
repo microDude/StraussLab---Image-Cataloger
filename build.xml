@@ -1,0 +1,170 @@
+<?xml version="1.0"?>
+<project name="useBuildProperties" default="build-release">
+
+    <!-- Includes -->
+    <xmlproperty file="build.properties.xml" collapseAttributes="true"/>
+
+	<!-- Directories -->
+    <property name="project.src.dir" location="${basedir}/src/java"/>
+    <property name="project.src.dir.test" location="${basedir}/src/test"/>
+    <property name="project.dist.dir" location="${basedir}/dist"/>
+    <property name="project.bin.dir" location="${basedir}/bin"/>
+    <property name="project.cfg.dir" location="${basedir}/cfg"/>
+    <property name="project.res.dir" location="${basedir}/resources"/>
+    <property name="project.lib.dir" location="${basedir}/lib"/>
+	<property name="project.dist.classes.dir" location="${project.dist.dir}/classes"/>
+	<property name="project.javadoc.dir" location="${project.dist.dir}/javadoc"/>
+    <property name="project.lib.customer.dir" location="${project.lib.dir}/customer"/>
+
+	<!-- Derived Directories -->
+    <property name="project.project.dist.version.dir" value="${project.dist.dir}/${project.dist.version}-${project.name}"/>
+    <property name="project.dist.jar.filename" value="${project.name}.jar"/>
+    <property name="project.dist.zip.filename" value="${project.name}-${project.dist.version}.zip"/>
+
+    <property environment="env" />
+    <property name="java.boot.classpath" value="${env.JAVA_HOME}" />
+
+	<!-- Class Path for all Library Dependencies -->
+    <path id="project.class.path">
+        <fileset dir="${project.lib.dir}">
+            <include name="**/*.jar"/>
+            <include name="**/*.zip"/>
+        </fileset>
+    </path>
+
+    <taskdef resource="net/sf/antcontrib/antcontrib.properties" classpathref="project.class.path"/>
+
+    <!-- The default entry point -->
+    <target name="build-release" description="default: Make everything"
+            depends="prepare-dist, build-components, copy-dist, zip-dist"/>
+
+
+    <!-- Creates needed directories etc. -->
+    <target name="prepare-dist">
+
+    	<delete dir="${project.project.dist.version.dir}"/>
+        <mkdir dir="${project.project.dist.version.dir}"/>
+
+        <delete dir="${project.dist.classes.dir}"/>
+        <mkdir dir="${project.dist.classes.dir}"/>
+
+    </target>
+
+    <!-- Compiles and creates JAR -->
+    <target name="build-components">
+
+        <!-- todo ${project.src.dir.test} Testklassen optional fuer Simulator -->
+        <javac srcdir="${project.src.dir}:${project.src.dir.test}"
+               destdir="${project.dist.classes.dir}"
+               debug="${project.compiler.debug}"
+               optimize="${project.compiler.optimize}"
+               deprecation="${project.compiler.deprecation}"
+               target="${project.compiler.target}"
+               source="${project.compiler.source}"
+               verbose="${project.compiler.verbose}"
+			   includeantruntime="false">
+            <classpath refid="project.class.path"/>
+            <!-- Uncomment when using Java Version 1.6 and earlier for Ant. The JAVA_HOME environment variable must be set. -->
+            <bootclasspath>
+                <fileset dir="${project.lib.dir}">
+                    <include name="**/*.jar"/>
+                    <include name="**/*.zip"/>
+                </fileset>
+                <fileset dir="${java.boot.classpath}">
+                    <include name="**/*.jar"/>
+                </fileset>
+            </bootclasspath>
+        </javac>
+
+        <tstamp/>
+
+        <jar jarfile="${project.lib.customer.dir}/${project.dist.jar.filename}" basedir="${project.dist.classes.dir}">
+            <manifest>
+				<attribute name="Created-By" value="${user.name}, ${DSTAMP}-${TSTAMP}, ${os.name}-${os.arch}-${os.version}"/>
+				<attribute name="Built-By" value="${user.name}"/>
+                <attribute name="Specification-Title" value="${project.name}"/>
+				<attribute name="Specification-Version" value="${project.dist.version}"/>
+				<attribute name="Specification-Vendor" value="${project.company}"/>
+				<attribute name="Implementation-Title" value="${project.name}"/>
+				<attribute name="Implementation-Version" value="${project.dist.version}"/>
+				<attribute name="Implementation-Vendor" value="${project.company}"/>
+            </manifest>
+        </jar>
+
+    </target>
+
+    <!-- Copies files to be distributed -->
+    <target name="copy-dist">
+
+        <property name="component" value=""/>
+        <foreach list="${project.dist.releasedComponents.component}" target="copy-component" param="component"
+                 inheritall="true"/>
+
+    </target>
+
+    <!-- Copies files per component -->
+    <target name="copy-component">
+
+        <!-- cfg -->
+        <copy todir="${project.project.dist.version.dir}/cfg" overwrite="true">
+            <fileset dir="${project.cfg.dir}">
+                <include name="*.*"/>
+                <include name="${project.name}/**/*.*"/>
+            </fileset>
+        </copy>
+
+        <replace dir="${project.project.dist.version.dir}/james" includes="**/*.xml">
+            <replacefilter token="build/classes" value="lib/customer/${project.dist.jar.filename}"/>
+        </replace>
+
+        <!-- lib -->
+        <copy todir="${project.project.dist.version.dir}/lib" overwrite="true">
+            <fileset dir="${project.lib.dir}">
+                <include name="customer/${project.dist.jar.filename}"/>
+                <include name="external/*.jar"/>
+                <include name="native/*.*"/>
+                <include name="systema/*-o-s.jar"/>
+            </fileset>
+        </copy>
+
+        <!-- res -->
+        <copy todir="${project.project.dist.version.dir}/res" overwrite="true">
+            <fileset dir="${project.res.dir}">
+                <include name="**/*"/>
+            </fileset>
+        </copy>
+
+    </target>
+
+    <!-- creates distributable zip file -->
+    <target name="zip-dist">
+
+        <zip destfile="${project.dist.dir}/${project.dist.zip.filename}" basedir="${project.dist.dir}"
+             includes="${project.dist.version}-${project.name}/**/*"/>
+
+    </target>
+	
+	<!-- Creates the JAVA DOCs-->
+	<target name="javadoc">
+		<tstamp>
+			<format property="year" pattern="yyyy"/>
+		</tstamp>
+		<mkdir dir="${project.javadoc.dir}"/>
+		<javadoc destdir="${project.javadoc.dir}"
+             author="true"
+             access="private"
+             version="true"
+             use="true"
+             splitindex="true"
+             noindex="false"
+             windowtitle="${project.name} API"
+             doctitle="${project.name}"
+             bottom="Copyright &#169; ${year} ${project.company}. All Rights Reserved.">
+			<classpath refid="project.class.path"/>
+
+			<fileset dir="${project.src.dir}"/>
+			<package name="**"/>
+		</javadoc>
+	</target>
+	
+</project>

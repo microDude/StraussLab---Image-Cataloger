@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<project>
+     
+	<!-- Project Level -->
+	<name>Image-Catalogger</name>
+	<company>com.gregorygutshall</company>
+	
+	<!-- Compiler Level -->
+	<compiler>
+		<debug>on</debug>
+		<optimize>off</optimize>
+		<deprecation>on</deprecation>
+		<verbose>off</verbose>
+		<target>1.8</target>
+		<source>1.8</source>
+		<access>private</access>
+	</compiler>
+
+    <dist>
+        <version>1-0-0</version>
+    </dist>
+</project>
