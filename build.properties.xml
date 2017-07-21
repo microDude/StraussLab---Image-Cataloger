@@ -2,7 +2,7 @@
 <project>
      
 	<!-- Project Level -->
-	<name>Image-Catalogger</name>
+	<name>Image-Cataloger</name>
 	<company>com.gregorygutshall</company>
 	
 	<!-- Compiler Level -->
@@ -18,5 +18,6 @@
 
     <dist>
         <version>1-0-0</version>
+		<createjavdoc>true</createjavdoc>
     </dist>
 </project>

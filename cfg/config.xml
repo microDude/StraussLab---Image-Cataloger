@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <config>
-	<pathToExcelFile></pathToExcelFile>
+	<pathToExcelFile>./resources/example_exceldoc_v1.xlsx</pathToExcelFile>
 	<directories>
-		<pickUp></pickUp>
-		<dropOff></dropOff>
-		<error></error>
+		<pickUp>./test/pickupDir</pickUp>
+		<dropOff>./test/dropOffDir</dropOff>
+		<error>./test/errorDir</error>
 	</directories>
 	<naming>
-		<extension></extension>
-		<dateFormat></dateFormat>
+		<extension>.jpg</extension>
+		<dateFormat>yyyy_MM_dd</dateFormat>
 	</naming>
 </config>

@@ -6,7 +6,6 @@
 @set CUSLIBPATH=%STARTPATH%lib/customer
 @set EXTLIBPATH=%STARTPATH%lib/external
 @set NATLIBPATH=%STARTPATH%lib/native
-@set SYSLIBPATH=%STARTPATH%lib/systema
 @set UTILIBPATH=%STARTPATH%lib/util
 
 
@@ -14,25 +13,19 @@
 @set CLASSPATH=;
 
 @rem ** Append the third party libraries that are used by (all) applications:
-@set CLASSPATH=%EXTLIBPATH%/activemq-all-5.10.1.jar;%CLASSPATH%
-@set CLASSPATH=%EXTLIBPATH%/jtds-1.3.1.jar;%CLASSPATH%
-@set CLASSPATH=%EXTLIBPATH%/ant-contrib.jar;%CLASSPATH%
-@set CLASSPATH=%EXTLIBPATH%/resolver.jar;%CLASSPATH%
-
-@set CLASSPATH=%NATLIBPATH%/junit-4.12.jar;%CLASSPATH%
-
-@rem ** Append the components that are used by (all) applications:
-@set CLASSPATH=%SYSLIBPATH%/bus-jms-active-o-s.jar;%CLASSPATH%
-@set CLASSPATH=%SYSLIBPATH%/config-nxml-o-s.jar;%CLASSPATH%
-@set CLASSPATH=%SYSLIBPATH%/csfw-o-s.jar;%CLASSPATH%
-@set CLASSPATH=%SYSLIBPATH%/db-requester-o-s.jar;%CLASSPATH%
-@set CLASSPATH=%SYSLIBPATH%/jbasin-o-s.jar;%CLASSPATH%
-@set CLASSPATH=%SYSLIBPATH%/jtools-o-s.jar;%CLASSPATH%
-@set CLASSPATH=%SYSLIBPATH%/logger-file-o-s.jar;%CLASSPATH%
-@set CLASSPATH=%SYSLIBPATH%/msg-vfei-o-s.jar;%CLASSPATH%
+@set CLASSPATH=%EXTLIBPATH%/commons-codec.jar;%CLASSPATH%
+@set CLASSPATH=%EXTLIBPATH%/commons-collections4.jar;%CLASSPATH%
+@set CLASSPATH=%EXTLIBPATH%/curvesapi.jar;%CLASSPATH%
+@set CLASSPATH=%EXTLIBPATH%/jdom.jar;%CLASSPATH%
+@set CLASSPATH=%EXTLIBPATH%/log4j.jar;%CLASSPATH%
+@set CLASSPATH=%EXTLIBPATH%/poi.jar;%CLASSPATH%
+@set CLASSPATH=%EXTLIBPATH%/poi-ooxml.jar;%CLASSPATH%
+@set CLASSPATH=%EXTLIBPATH%/poi-ooxml-schemas.jar;%CLASSPATH%
+@set CLASSPATH=%EXTLIBPATH%/stax-api.jar;%CLASSPATH%
+@set CLASSPATH=%EXTLIBPATH%/xmlbeans.jar;%CLASSPATH%
 
 @rem ** Append the startpath for loading the language files (ResourceBundles) to the classpath(!):
-@set CLASSPATH=%STARTPATH%res;%CLASSPATH%
+@set CLASSPATH=%STARTPATH%resources;%CLASSPATH%
 
 @rem ** Set the path to native libraries:
 @set PATH=%JAVA_HOME%/bin;%NATLIBPATH%;%PATH%

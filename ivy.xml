@@ -21,7 +21,25 @@
        xsi:noNamespaceSchemaLocation="http://ant.apache.org/ivy/schemas/ivy.xsd">
     <info
         organisation="com.gregorygutshall"
-        module=""
+        module="EI"
         status="integration">
+        <ivyauthor name="Gregory Gutshall" url="http://gregorygutshall.com"/>
 	</info>
+	<configurations>
+		<conf name="external" description="External Project Dependencies"/>
+		<conf name="test" description="Testing Project Dependencies"/>
+		<conf name="util" description="Utility Project Dependencies"/>
+	</configurations>
+	<dependencies>
+		<dependency org="org.apache.poi" name="poi" rev="3.16" conf="external->default"/>
+		<dependency org="org.apache.poi" name="poi-ooxml" rev="3.16" conf="external->default"/>
+		<dependency org="jdom" name="jdom" rev="1.1" conf="external->default"/>
+		<dependency org="log4j" name="log4j" rev="1.2.17" conf="external->default"/>
+	
+		<dependency org="junit" name="junit" rev="4.12" conf="test->default"/>
+		
+		<dependency org="org.apache.ant" name="ant" rev="1.9.9" conf="util->default"/>
+		<dependency org="ant-contrib" name="ant-contrib" rev="1.0b3" conf="util->default"/>
+		<dependency org="org.apache.ant" name="ant-launcher" rev="1.9.9" conf="util->default"/>
+	</dependencies>
 </ivy-module>

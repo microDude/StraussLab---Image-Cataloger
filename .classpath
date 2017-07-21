@@ -1,6 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry excluding="java/|test/" kind="src" path="src"/>
+	<classpathentry kind="src" path="src/test"/>
+	<classpathentry kind="src" path="src/java"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8"/>
+	<classpathentry kind="lib" path="lib/external/commons-codec.jar"/>
+	<classpathentry kind="lib" path="lib/external/commons-collections4.jar"/>
+	<classpathentry kind="lib" path="lib/external/jdom.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="http://www.jdom.org/docs/apidocs.1.1/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="lib/external/poi.jar"/>
+	<classpathentry kind="lib" path="lib/test/hamcrest-core.jar"/>
+	<classpathentry kind="lib" path="lib/test/junit.jar"/>
+	<classpathentry kind="lib" path="lib/external/curvesapi.jar"/>
+	<classpathentry kind="lib" path="lib/external/poi-ooxml-schemas.jar"/>
+	<classpathentry kind="lib" path="lib/external/poi-ooxml.jar"/>
+	<classpathentry kind="lib" path="lib/external/stax-api.jar"/>
+	<classpathentry kind="lib" path="lib/external/xmlbeans.jar"/>
+	<classpathentry kind="lib" path="lib/external/log4j.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>

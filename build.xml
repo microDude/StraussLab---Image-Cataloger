@@ -15,7 +15,7 @@
     <property name="project.dist.dir" location="${basedir}/dist"/>
     <property name="project.bin.dir" location="${basedir}/bin"/>
     <property name="project.cfg.dir" location="${basedir}/cfg"/>
-    <property name="project.res.dir" location="${basedir}/res"/>
+    <property name="project.res.dir" location="${basedir}/resources"/>
     <property name="project.lib.dir" location="${basedir}/lib"/>
 	<property name="project.lib.customer.dir" location="${project.lib.dir}/customer"/>
 	<property name="project.dist.classes.dir" location="${project.dist.dir}/classes"/>
@@ -137,6 +137,13 @@
     <!-- Copies files to be distributed -->
     <target name="copy-dist">
 
+		<!-- bin -->
+        <copy todir="${project.dist.version.dir}/bin" overwrite="true">
+            <fileset dir="${project.bin.dir}">
+                <include name="**/*"/>
+            </fileset>
+        </copy>
+	
         <!-- cfg -->
         <copy todir="${project.dist.version.dir}/cfg" overwrite="true">
             <fileset dir="${project.cfg.dir}">
@@ -154,7 +161,7 @@
         </copy>
 
         <!-- res -->
-        <copy todir="${project.dist.version.dir}/res" overwrite="true">
+        <copy todir="${project.dist.version.dir}/resources" overwrite="true">
             <fileset dir="${project.res.dir}">
                 <include name="**/*"/>
             </fileset>
