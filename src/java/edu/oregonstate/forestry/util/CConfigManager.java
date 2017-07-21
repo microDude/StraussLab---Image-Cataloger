@@ -28,11 +28,12 @@ public class CConfigManager {
 	Document configDoc;
 	
 	public interface CONFIG_ITEMS {
-		String pathToExcelFile = "pathToExcelFile";
+		String pathToCatalogFile = "pathToCatalogFile";
 		String directories = "directories";
 		String pickUp = "pickUp";
 		String dropOff = "dropOff";
 		String error = "error";
+		String catalogBackup = "catalogBackup";
 		String naming = "naming";
 		String extension = "extension";
 		String dateFormat = "dateFormat";
@@ -54,8 +55,8 @@ public class CConfigManager {
 	 * @return
 	 * @throws Exception
 	 */
-	public File getExcelFile() throws Exception {
-		return new File(getRootElement().getChildTextTrim(CONFIG_ITEMS.pathToExcelFile));
+	public File getCatalogFile() throws Exception {
+		return new File(getRootElement().getChildTextTrim(CONFIG_ITEMS.pathToCatalogFile));
 	}
 	
 	/**
@@ -86,6 +87,16 @@ public class CConfigManager {
 	 */
 	public Path getErrorDirectory() throws Exception {
 		return Paths.get(getRootElement().getChild(CONFIG_ITEMS.directories).getChildTextTrim(CONFIG_ITEMS.error));
+	}
+	
+	/**
+	 * Directory where the catalog file will be backed up to before processing.
+	 * 
+	 * @return
+	 * @throws Exception
+	 */
+	public Path getCatalogBackupDirectory() throws Exception {
+		return Paths.get(getRootElement().getChild(CONFIG_ITEMS.directories).getChildTextTrim(CONFIG_ITEMS.catalogBackup));
 	}
 	
 	/**

@@ -10,10 +10,15 @@ package edu.oregonstate.forestry.app;
 import java.io.File;
 import java.io.FileInputStream;
 import java.nio.file.FileSystems;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardWatchEventKinds;
 import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -60,10 +65,23 @@ public class CImageCatalogApp implements Runnable {
 		CLogHelper.log("Set pickup Directory to: " + pickUpDir.toString());
 		CLogHelper.log("Set drop off Directory to: " + configManager.getDropOffDirectory().toString());
 		
+		// Backup the current Catalog File
+		String catalogFileName = configManager.getCatalogFile().getName();
+		Path backupFile = configManager.getCatalogBackupDirectory().resolve(
+				catalogFileName.substring(0, catalogFileName.lastIndexOf(".")) 
+				+ "_"
+				+ new SimpleDateFormat("yyyy-MM-dd_HH_mm_ss").format(new Date())
+				+ catalogFileName.substring(catalogFileName.lastIndexOf(".")));
+		
+		Files.copy(Paths.get(configManager.getCatalogFile().toURI()), backupFile, StandardCopyOption.REPLACE_EXISTING);
+		CLogHelper.log("Created Backup Catalog File: " + backupFile.toString());
+		
+		
 		// Load the Excel File
-		FileInputStream inputStream = new FileInputStream(configManager.getExcelFile());
+		FileInputStream inputStream = new FileInputStream(configManager.getCatalogFile());
 		this.excelWorkBook = new XSSFWorkbook(inputStream);
-		CLogHelper.log("Excel reference file: " + configManager.getExcelFile().getAbsolutePath());
+		CLogHelper.log("Loaded catalog file: " + configManager.getCatalogFile().getAbsolutePath());
+		inputStream.close();
 		
 	}
 

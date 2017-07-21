@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <config>
-	<pathToExcelFile>./resources/example_exceldoc_v1.xlsx</pathToExcelFile>
+	<pathToCatalogFile>./resources/example_exceldoc_v1.xlsx</pathToCatalogFile>
 	<directories>
 		<pickUp>./test/pickupDir</pickUp>
 		<dropOff>./test/dropOffDir</dropOff>
 		<error>./test/errorDir</error>
+		<catalogBackup>./test/catalogBackup</catalogBackup>
 	</directories>
 	<naming>
 		<extension>.jpg</extension>
