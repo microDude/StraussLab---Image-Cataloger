@@ -8,13 +8,15 @@
 package edu.oregonstate.forestry.app;
 
 import java.io.File;
-import java.io.FileInputStream;
+import java.io.IOException;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
+import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardWatchEventKinds;
+import java.nio.file.WatchEvent;
 import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
 import java.text.SimpleDateFormat;
@@ -22,9 +24,9 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-
+import edu.oregonstate.forestry.exceptions.CImageCatalogException;
+import edu.oregonstate.forestry.exceptions.IImageCatalogExceptions;
+import edu.oregonstate.forestry.util.CCatalogManager;
 import edu.oregonstate.forestry.util.CConfigManager;
 import edu.oregonstate.forestry.util.CLogHelper;
 
@@ -38,12 +40,12 @@ public class CImageCatalogApp implements Runnable {
 	// config manager
 	private final CConfigManager configManager;
 	
+	// catalog manager
+	private final CCatalogManager catalogManager;
+	
 	// Directory Watching Service
 	private final WatchService watcher;
 	private final Map<WatchKey,Path> keys;
-	
-	// Excel File 
-	private final Workbook excelWorkBook;
 	
 	/**
 	 * Constructor
@@ -62,8 +64,8 @@ public class CImageCatalogApp implements Runnable {
 		Path pickUpDir = configManager.getPickUpDirectory();
 		WatchKey key = pickUpDir.register(this.watcher, StandardWatchEventKinds.ENTRY_CREATE);
 		keys.put(key, pickUpDir);
-		CLogHelper.log("Set pickup Directory to: " + pickUpDir.toString());
-		CLogHelper.log("Set drop off Directory to: " + configManager.getDropOffDirectory().toString());
+		CLogHelper.logInfo("Set pickup Directory to: " + pickUpDir.toString());
+		CLogHelper.logInfo("Set drop off Directory to: " + configManager.getDropOffDirectory().toString());
 		
 		// Backup the current Catalog File
 		String catalogFileName = configManager.getCatalogFile().getName();
@@ -74,21 +76,95 @@ public class CImageCatalogApp implements Runnable {
 				+ catalogFileName.substring(catalogFileName.lastIndexOf(".")));
 		
 		Files.copy(Paths.get(configManager.getCatalogFile().toURI()), backupFile, StandardCopyOption.REPLACE_EXISTING);
-		CLogHelper.log("Created Backup Catalog File: " + backupFile.toString());
+		CLogHelper.logInfo("Created Backup Catalog File: " + backupFile.toString());
 		
-		
-		// Load the Excel File
-		FileInputStream inputStream = new FileInputStream(configManager.getCatalogFile());
-		this.excelWorkBook = new XSSFWorkbook(inputStream);
-		CLogHelper.log("Loaded catalog file: " + configManager.getCatalogFile().getAbsolutePath());
-		inputStream.close();
-		
+		// Load the Catalog Manager
+		this.catalogManager = new CCatalogManager(configManager.getCatalogFile());
 	}
 
 	@Override
 	public void run() {
 		
 		// process File Events
+		boolean isEndOfFile = false;
+		while(!isEndOfFile) {
+			
+			// wait for key to be signaled
+			WatchKey key = null;
+			Path newFile = null;
+			try {
+				key = watcher.take();
+				
+				// Get the directory associated with this key
+	            Path dir = keys.get(key);
+	            
+	            // Context for directory entry event is the file name of entry
+	            WatchEvent<?> event = key.pollEvents().get(0);
+
+	            // Get the name of the new file
+	            Path name = (Path) event.context();
+	            
+	            // Get the full path of the new file
+	            newFile = dir.resolve(name);
+
+	            // Create path to destination file
+	            Path destinationFile = configManager.getDropOffDirectory().resolve(catalogManager.getCurrentImageName() + "_" + configManager.getDateFormat() + configManager.getFileExtension());
+	            
+	            // Move the file
+	            Files.move(newFile, destinationFile, StandardCopyOption.REPLACE_EXISTING);
+	            
+	            // Update the excel document
+	            catalogManager.setHyperlinkCellValue(destinationFile);
+				
+			} catch (InterruptedException ex) {
+				CLogHelper.logError("Error while getting the new file. Exception: " + ex.getMessage());
+			} catch (IOException ex1) {
+				// Occurs, if we could not move the file
+				
+				try {
+					CLogHelper.logError("Error while moving the file to the destination path " + configManager.getDropOffDirectory().toUri().toString() + ". Exception: " + ex1.getMessage());
+				
+					// Try to move the image file to the error directory
+					if (newFile != null) {
+						try {
+							CLogHelper.logInfo("Try to move the file to the Error Directory for future inspection.");
+							Files.move(newFile, configManager.getErrorDirectory().resolve(catalogManager.getCurrentImageName() + "_" + configManager.getDateFormat() + configManager.getFileExtension()), StandardCopyOption.REPLACE_EXISTING);
+						} catch (Exception e) {
+							CLogHelper.logError("Error while trying to move the image file to the error directory. Exception: " + e.getMessage());
+						}
+					}
+					
+				
+				} catch (InvalidPathException e) {
+					// Do nothing.
+				}
+			} catch (InvalidPathException ex2) {
+				CLogHelper.logError("Could not parse or generate the path to: " + ex2.getInput() + ".  Exception: " + ex2.getMessage());
+			} catch (CImageCatalogException ex3) {
+				
+				switch (ex3.getErrorCode()) {
+					case IImageCatalogExceptions.COULD_NOT_SAVE_CATALOG_FILE:
+						CLogHelper.logError("Could not save the updated catalog file.  Close any other open references to this document, before continuing.");
+						break;
+					case IImageCatalogExceptions.EOF_CATALOG_FILE:
+						CLogHelper.logInfo("Reached End of File!  Self Terminate.");
+						isEndOfFile = true;
+						break;
+					default:
+						CLogHelper.logWarning(ex3.getMessage());
+				}
+				
+			} finally {
+				// reset key, so we can pick up new events.
+				if (key != null) {
+					key.reset();
+				}
+			}
+
+		}
+		
+		// Try to save the file, one last time.
+		catalogManager.saveCatalogFile();
 		
 	}
 	

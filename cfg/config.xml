@@ -9,6 +9,6 @@
 	</directories>
 	<naming>
 		<extension>.jpg</extension>
-		<dateFormat>yyyy_MM_dd</dateFormat>
+		<dateFormat>yyyy-MM-dd_hhmmss</dateFormat>
 	</naming>
 </config>

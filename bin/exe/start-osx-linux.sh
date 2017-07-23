@@ -11,3 +11,5 @@ export JVMARGS=
 export JVMARGS="$JVMARGS -showversion"
 
 java $JVMARGS edu.oregonstate.forestry.server.CMain
+
+read -n1 -r -p "Press any key to continue..."

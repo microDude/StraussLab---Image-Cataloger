@@ -28,15 +28,15 @@ public class CMain {
 		// Setup Log4J
 		PropertyConfigurator.configure("./resources/log4j.properties");
 		
-		CLogHelper.log("Starting Application...");
+		CLogHelper.logInfo("Starting Application...");
 		
 		// Get the configuration file
 		String pathToConfig = "./cfg/config.xml";
 		if (args.length > 0) {
 			pathToConfig = args[0];
-			CLogHelper.log("Configuration File Set to: " + pathToConfig);
+			CLogHelper.logInfo("Configuration File Set to: " + pathToConfig);
 		} else {
-			CLogHelper.log("No configuration file set, use default path: " + pathToConfig);
+			CLogHelper.logInfo("No configuration file set, use default path: " + pathToConfig);
 		}
 		
 		// Start the application 
@@ -59,7 +59,7 @@ public class CMain {
 			// Wait forever, or until run() is completed
 		}
 		
-		CLogHelper.log("\n" + "Terminating Server");
+		CLogHelper.logInfo("\n" + "Terminating Server");
 		
 	}
 
