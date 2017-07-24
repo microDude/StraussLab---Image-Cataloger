@@ -19,7 +19,9 @@ import org.apache.poi.hssf.util.HSSFColor;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.CreationHelper;
+import org.apache.poi.ss.usermodel.DateUtil;
 import org.apache.poi.ss.usermodel.Font;
+import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFFont;
@@ -38,7 +40,13 @@ public class CCatalogManager {
 
 	// Static EXCEL File config
 	private interface COLUMN {
-		int directoryCellIndex 			= 2;
+		int index				= 0;
+		int genotype			= 1;
+		int genotypeID			= 2;
+		int block				= 3;
+		int treatment			= 4;
+		int imageLink 			= 5;
+		int imagePath			= 6;
 	}
 	
 	// Excel File 
@@ -129,16 +137,24 @@ public class CCatalogManager {
 		XSSFHyperlink link = (XSSFHyperlink) cellCreationHelper.createHyperlink(HyperlinkType.URL);
 		link.setAddress(uriPath);
 		
-		// Create the cell
-		Cell directoryCell = sheet0.getRow(getCurrentRow()).createCell(COLUMN.directoryCellIndex);
+		// Create the File Link Cell
+		Cell imageHyperlinkCell = sheet0.getRow(getCurrentRow()).createCell(COLUMN.imageLink);
 		
 		// Create Hyperlink and insert into sheet
-		directoryCell.setCellValue(uriPath);
-		directoryCell.setHyperlink(link);
-		directoryCell.setCellStyle(hlinkstyle);
+		imageHyperlinkCell.setCellValue("File Link");
+		imageHyperlinkCell.setHyperlink(link);
+		imageHyperlinkCell.setCellStyle(hlinkstyle);
+		
+		// Create the Image Path Cell
+		Cell imagePathCell = sheet0.getRow(getCurrentRow()).createCell(COLUMN.imagePath);
+		imagePathCell.setCellValue(uriPath);
+		
+		CLogHelper.logInfo("Hyperlink set in Catalog file.");
 		
 		// Try to save the file between writes
 		saveCatalogFile();
+		
+		CLogHelper.logInfo("Catalog File was updated and saved.");
 	
 		// Set to the next available row.
 		setToNextAvailableRow();
@@ -181,7 +197,15 @@ public class CCatalogManager {
 			return "End of File (EOF) reached.";
 		}
 		
-		return "TODO_" + Integer.toString(rowNum);
+		Row desiredRow = sheet0.getRow(rowNum);
+		
+		StringBuilder sbBuilder = new StringBuilder();
+		sbBuilder.append(getCellStringValue(desiredRow.getCell(COLUMN.genotype)) + "_");
+		sbBuilder.append(getCellStringValue(desiredRow.getCell(COLUMN.genotypeID)) + "_");
+		sbBuilder.append(getCellStringValue(desiredRow.getCell(COLUMN.block)) + "_");
+		sbBuilder.append(getCellStringValue(desiredRow.getCell(COLUMN.treatment)));
+		
+		return sbBuilder.toString();
 	}
 
 	/**
@@ -218,10 +242,10 @@ public class CCatalogManager {
 		
 		for (int i = getCurrentRow(); i < numRows; i++) {
 			
-			Cell directoryCell = sheet0.getRow(i).getCell(COLUMN.directoryCellIndex);
+			Cell directoryCell = sheet0.getRow(i).getCell(COLUMN.imageLink);
 			
 			// Skip to next row, if there is already a hyperlink
-			if (directoryCell != null) {
+			if (directoryCell != null && !directoryCell.getRichStringCellValue().toString().isEmpty()) {
 				continue;
 			} else {
 				setCurrentRow(i);
@@ -230,6 +254,46 @@ public class CCatalogManager {
 			
 		}
 		
+		
+	}
+	
+	/**
+	 * This will return the {@link String} value of the supplied {@link Cell}.
+	 * @param cell
+	 * @return
+	 */
+	private String getCellStringValue(Cell cell) {
+		
+		switch (cell.getCellTypeEnum()) {
+	        case STRING:
+	            return cell.getRichStringCellValue().getString();
+	        case NUMERIC:
+	            if (DateUtil.isCellDateFormatted(cell)) {
+	            	return cell.getDateCellValue().toString();
+	            } else {
+	            	return Double.toString(cell.getNumericCellValue());
+	            }
+	        case BOOLEAN:
+	            return Boolean.toString(cell.getBooleanCellValue());
+	        case FORMULA:
+	            switch(cell.getCachedFormulaResultTypeEnum()) {
+	                case STRING:
+	                    return cell.getRichStringCellValue().toString();
+	                case NUMERIC:
+	                    return Double.toString(cell.getNumericCellValue());
+	                case BOOLEAN:
+	                	return Boolean.toString(cell.getBooleanCellValue());
+					default:
+						// Support other types???
+						return "";
+	            }
+	        case BLANK:
+	        	return "";
+	        case ERROR:
+	        	return "[ErrorInFormula]";
+	        default:
+	        	return cell.getRichStringCellValue().getString();
+		}
 		
 	}
 	

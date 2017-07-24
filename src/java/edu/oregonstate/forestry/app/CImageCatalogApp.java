@@ -87,34 +87,42 @@ public class CImageCatalogApp implements Runnable {
 		
 		// process File Events
 		boolean isEndOfFile = false;
+		// wait for key to be signaled
+		WatchKey key = null;
+		WatchEvent<?> event = null;
+		Path newFile = null;
+		Path destinationFile = null;
 		while(!isEndOfFile) {
 			
-			// wait for key to be signaled
-			WatchKey key = null;
-			Path newFile = null;
+			CLogHelper.logInfo("Next Image --> " + catalogManager.getCurrentImageName());
+			
 			try {
+				
+				// Waits for the OS to trigger a StandardWatchEventKinds.ENTRY_CREATE
 				key = watcher.take();
 				
-				// Get the directory associated with this key
-	            Path dir = keys.get(key);
-	            
+				CLogHelper.logInfo("New Image arrived!");
+				         
 	            // Context for directory entry event is the file name of entry
-	            WatchEvent<?> event = key.pollEvents().get(0);
+	            event = key.pollEvents().get(0);
 
-	            // Get the name of the new file
-	            Path name = (Path) event.context();
-	            
 	            // Get the full path of the new file
-	            newFile = dir.resolve(name);
+	            newFile = configManager.getPickUpDirectory().resolve((Path) event.context());
+	            
+	            CLogHelper.logInfo("New Image File: " + newFile.getFileName());
 
 	            // Create path to destination file
-	            Path destinationFile = configManager.getDropOffDirectory().resolve(catalogManager.getCurrentImageName() + "_" + configManager.getDateFormat() + configManager.getFileExtension());
+	            destinationFile = configManager.getDropOffDirectory().resolve(catalogManager.getCurrentImageName() + "_" + configManager.getDateFormat() + configManager.getFileExtension());
 	            
 	            // Move the file
 	            Files.move(newFile, destinationFile, StandardCopyOption.REPLACE_EXISTING);
 	            
+	            CLogHelper.logInfo("Image File moved to: " + destinationFile.toUri().toString());
+	            
 	            // Update the excel document
 	            catalogManager.setHyperlinkCellValue(destinationFile);
+	            
+	            CLogHelper.logInfo("Finished Processing, waiting for next Image. \n");
 				
 			} catch (InterruptedException ex) {
 				CLogHelper.logError("Error while getting the new file. Exception: " + ex.getMessage());

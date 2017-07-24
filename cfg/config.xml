@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <config>
-	<pathToCatalogFile>./resources/example_exceldoc_v1.xlsx</pathToCatalogFile>
+	<pathToCatalogFile>./test/excelFiles/GenotypeMasterList.xlsx</pathToCatalogFile>
 	<directories>
 		<pickUp>./test/pickupDir</pickUp>
 		<dropOff>./test/dropOffDir</dropOff>
