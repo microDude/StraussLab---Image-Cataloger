@@ -11,7 +11,7 @@
 
 @set JVMARGS=
 @set JVMARGS=%JVMARGS% -showversion 
-@set JVMARGS=%JVMARGS% -Xmx 120M 
+@set JVMARGS=%JVMARGS% -Xmx120M 
 
 "%JAVA_HOME%/bin/java" %JVMARGS% edu.oregonstate.forestry.server.CMain
 
