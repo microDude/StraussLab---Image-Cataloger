@@ -17,6 +17,7 @@
     <property name="project.cfg.dir" location="${basedir}/cfg"/>
     <property name="project.res.dir" location="${basedir}/resources"/>
     <property name="project.lib.dir" location="${basedir}/lib"/>
+	<property name="project.test.dir" location="${basedir}/test"/>
 	<property name="project.lib.customer.dir" location="${project.lib.dir}/customer"/>
 	<property name="project.dist.classes.dir" location="${project.dist.dir}/classes"/>
 	<property name="project.dist.javadoc.dir" location="${project.dist.dir}/javadoc"/>
@@ -163,6 +164,13 @@
         <!-- res -->
         <copy todir="${project.dist.version.dir}/resources" overwrite="true">
             <fileset dir="${project.res.dir}">
+                <include name="**/*"/>
+            </fileset>
+        </copy>
+		
+		<!-- test -->
+        <copy todir="${project.dist.version.dir}/test" overwrite="true">
+            <fileset dir="${project.test.dir}">
                 <include name="**/*"/>
             </fileset>
         </copy>
